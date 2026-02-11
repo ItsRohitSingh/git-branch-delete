@@ -17,8 +17,8 @@
 #>
 
 # Configuration
-$daysThreshold = 0
-$excludedBranches = @("main", "master")
+$daysThreshold = 0 # WARNING: 0 means delete everything not committed today. Set to 1 for > 24 hours.
+$excludedBranches = @("main", "master", "develop", "test", "release", "production")
 
 # 1. Fetch and Prune
 Write-Host "Fetching updates and pruning remote tracking branches..." -ForegroundColor Cyan
@@ -68,7 +68,8 @@ foreach ($ref in $refs) {
     if ($lastCommitDate -lt $thresholdDate) {
         Write-Host "Found old branch: $branchName (Last commit: $lastCommitDate)" -ForegroundColor Yellow
         $branchesToDelete += $branchName
-    } else {
+    }
+    else {
         Write-Host "Keeping recent branch: $branchName (Last commit: $lastCommitDate)" -ForegroundColor Green
     }
 }
@@ -76,16 +77,18 @@ foreach ($ref in $refs) {
 # 5. Delete Branches
 if ($branchesToDelete.Count -eq 0) {
     Write-Host "`nNo old branches found to delete." -ForegroundColor Green
-} else {
+}
+else {
     Write-Host "`nFound $($branchesToDelete.Count) branches to delete." -ForegroundColor Yellow
     
     foreach ($branch in $branchesToDelete) {
         Write-Host "Deleting branch: $branch" -ForegroundColor Red
         # Check if the branch exists before deleting (safety)
         if (git show-ref --verify --quiet refs/heads/$branch) {
-             git branch -D $branch
-        } else {
-             Write-Host "Branch '$branch' not found or already deleted." -ForegroundColor DarkGray
+            git branch -D $branch
+        }
+        else {
+            Write-Host "Branch '$branch' not found or already deleted." -ForegroundColor DarkGray
         }
     }
     
