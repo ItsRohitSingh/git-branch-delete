@@ -1,0 +1,59 @@
+# Git Remote Branch Cleanup Script
+
+This PowerShell script automates the cleanup of old remote Git branches that have not been modified within a specified number of days.
+
+## Features
+
+- Fetches and prunes remote tracking branches (`git fetch --all --prune`).
+- Identifies remote branches older than a configurable threshold (default: 90 days).
+- Excludes critical branches (e.g., `main`, `master`, `develop`) from deletion.
+- Supports a **Dry Run** mode to preview changes before actual deletion.
+
+## Prerequisites
+
+- Windows with PowerShell.
+- Git installed and available in the system PATH.
+- Access to the remote repository (authenticated).
+
+## Configuration
+
+You can modify the following variables at the top of the `cleanup-branch.ps1` script:
+
+- **$daysThreshold**: Number of days to keep branches (default: 90).
+- **$excludedBranches**: List of branch names to protect from deletion (default: `main`, `master`, `develop`, `test`, `release`, `production`).
+- **$remoteName**: Name of the remote repository (default: `origin`).
+
+## Usage
+
+### 1. View Help
+The script includes comment-based help. You can view it using:
+```powershell
+Get-Help .\cleanup-branch.ps1 -Full
+```
+
+### 2. Dry Run (Default)
+By default, the script runs in **Dry Run** mode. It will list the branches that qualify for deletion without actually deleting them.
+
+```powershell
+.\cleanup-branch.ps1
+# OR
+.\cleanup-branch.ps1 -DryRun $true
+```
+
+### 3. Delete Branches
+To actually delete the remote branches, set the `-DryRun` parameter to `$false`.
+
+**⚠️ WARNING: This will permanently delete remote branches!**
+
+```powershell
+.\cleanup-branch.ps1 -DryRun $false
+```
+
+## How it Works
+
+1. **Fetch & Prune**: Updates the local knowledge of remote branches.
+2. **Scan**: Iterates through all remote refs (`refs/remotes/origin/*`).
+3. **Filter**:
+   - Ignores excluded branches.
+   - Compares the last commit date with the threshold date.
+4. **Delete**: If not in Dry Run mode, executes `git push origin --delete <branch_name>` for qualifying branches.
