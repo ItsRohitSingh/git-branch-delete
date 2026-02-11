@@ -2,7 +2,7 @@
 
 # Default values
 DRY_RUN=true
-DAYS_THRESHOLD=0
+DAYS_THRESHOLD=90
 REMOTE_NAME="origin"
 EXCLUDED_BRANCHES=("main" "master" "develop" "test" "release" "production" "HEAD" "origin")
 
