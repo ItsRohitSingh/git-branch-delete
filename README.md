@@ -34,19 +34,36 @@ Get-Help .\cleanup-branch.ps1 -Full
 ### 2. Dry Run (Default)
 By default, the script runs in **Dry Run** mode. It will list the branches that qualify for deletion without actually deleting them.
 
+#### PowerShell
 ```powershell
 .\cleanup-branch.ps1
 # OR
 .\cleanup-branch.ps1 -DryRun $true
 ```
 
+#### Bash (Shell)
+```bash
+# Make executable first
+chmod +x cleanup-branch.sh
+
+./cleanup-branch.sh
+# OR
+./cleanup-branch.sh --help
+```
+
 ### 3. Delete Branches
-To actually delete the remote branches, set the `-DryRun` parameter to `$false`.
+To actually delete the remote branches, use the delete flag.
 
 **⚠️ WARNING: This will permanently delete remote branches!**
 
+#### PowerShell
 ```powershell
 .\cleanup-branch.ps1 -DryRun $false
+```
+
+#### Bash (Shell)
+```bash
+./cleanup-branch.sh --delete
 ```
 
 ## How it Works
