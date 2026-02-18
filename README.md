@@ -74,3 +74,27 @@ To actually delete the remote branches, use the delete flag.
    - Ignores excluded branches.
    - Compares the last commit date with the threshold date.
 4. **Delete**: If not in Dry Run mode, executes `git push origin --delete <branch_name>` for qualifying branches.
+
+## Automated Cleanup (GitHub Actions)
+
+This repository includes a GitHub Action workflow `.github/workflows/cleanup-branches.yml` that automates the cleanup process.
+
+### Triggers
+
+1.  **Scheduled**: Runs automatically every Sunday at 00:00 UTC (Dry Run enabled by default).
+2.  **Manual**: Can be triggered manually from the "Actions" tab.
+
+### How to Run Manually
+
+1.  Go to the **Actions** tab in your GitHub repository.
+2.  Select the **Remote Branch Cleanup** workflow.
+3.  Click **Run workflow**.
+4.  Configure the inputs:
+    *   **Dry Run**: Uncheck to perform actual deletion.
+    *   **Days Threshold**: Set the age threshold for branches (default: 90).
+    *   **Remote Name**: Default is `origin`.
+
+### Permissions
+
+The workflow uses `GITHUB_TOKEN` to authenticate. Ensure your repository settings allow **Read and write permissions** for Workflow permissions (Settings > Actions > General).
+

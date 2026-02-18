@@ -1,0 +1,66 @@
+name: "Remote Branch Cleanup"
+
+on:
+  schedule:
+    # Run every Sunday at 00:00 UTC
+    - cron: '0 0 * * 0'
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: 'Dry Run (true/false)'
+        required: true
+        default: true
+        type: boolean
+      days_threshold:
+        description: 'Days Threshold'
+        required: true
+        default: '90'
+        type: string
+      remote_name:
+        description: 'Remote Name'
+        required: true
+        default: 'origin'
+        type: string
+
+jobs:
+  cleanup:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write # Required to delete branches
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # Fetch all history for all branches and tags
+
+      - name: Make script executable
+        run: chmod +x ./cleanup-branch.sh
+
+      - name: Run Cleanup Script
+        run: |
+          # Construct arguments based on inputs
+          ARGS=""
+          
+          if [ "${{ inputs.dry_run }}" == "false" ]; then
+            ARGS="$ARGS --delete"
+          fi
+          
+          if [ -n "${{ inputs.days_threshold }}" ]; then
+            ARGS="$ARGS --threshold ${{ inputs.days_threshold }}"
+          fi
+          
+          if [ -n "${{ inputs.remote_name }}" ]; then
+             ARGS="$ARGS --remote ${{ inputs.remote_name }}"
+          fi
+
+          # Handle schedule trigger (default to dry-run=true, threshold=90)
+          if [ "${{ github.event_name }}" == "schedule" ]; then
+            echo "Running scheduled cleanup (Dry Run)"
+            ./cleanup-branch.sh --threshold 90
+          else
+            echo "Running manual cleanup"
+            ./cleanup-branch.sh $ARGS
+          fi
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
